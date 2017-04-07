@@ -5,4 +5,4 @@ npm install
 
 ## utilization
 
-> node fablife prescriptorName1:prescriptorValue1 prescriptorName2:prescriptorValue2 ...
+> node fablife
