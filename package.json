@@ -1,0 +1,15 @@
+{
+  "name": "fablife",
+  "version": "0.0.1",
+  "description": "client tool for workshop-2",
+  "main": "fablife.js",
+  "scripts": {
+    "start": "node fablife.js"
+  },
+  "author": "Rony",
+  "dependencies": {
+    "lodash": "^4.0.0",
+    "memory-cache": "^0.1.4",
+    "request": "^2.67.0"
+  }
+}
