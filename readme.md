@@ -1,8 +1,7 @@
 # Command Line client for fablife Salus Api
 
-## installallation
+## init
 npm install
 
 ## utilization
-
 > node fablife
