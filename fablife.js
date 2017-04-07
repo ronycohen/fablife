@@ -1,13 +1,68 @@
-'use strict';
+var request = require('request');
+var prompt = require('prompt');
 
-if (process.argv.length === 0) {
-    console.info('usage: fablife [descriptor1] [descriptor2] [descriptor3] [descriptorx]');
-    process.exit(1);
+var bundle = "workshop-2";
+var items = [{name: 'sex'}, {name: 'weightCurrent'}, {name: 'age'}];
+var itemIdx = 0;
+
+prompt.start();
+
+function reqSalus(items) {
+    'use strict';
+    var options = {
+        method: 'POST',
+        json: true,
+        headers: {
+            'content-type': 'application/json',
+            Authorization: 'admin34'
+        },
+        body: items
+    };
+
+
+    request('http://api.salus.fablife.com/bundle/' + bundle + '/salus', options, function(error, response, body) {
+        if (error) {
+            console.log('  err: ' + error);
+        }
+
+        if (!error && response.statusCode === 200) {
+            console.log(JSON.stringify(body, null, 2));
+        } else {
+            console.log("there is an error in the typed values.");
+        }
+
+    });
 }
 
-var memory = require('memory-cache');
-var request = require('request');
+function getDescriptor() {
+    'use strict';
+    var descriptor = {
+        properties: {
+            descriptorValue: {
+                message: 'Please type a value for ' + items[itemIdx].name,
+                required: true
+            }
+        }
+    };
 
-process.argv.splice(0, 2);
+    prompt.get(descriptor, function(err, result) {
+        if (err) {
+            console.log('  err: ' + err);
+        }
 
-console.log(process.argv);
+        items[itemIdx].value = result.descriptorValue;
+        itemIdx++;
+
+        if (itemIdx < items.length) {
+            getDescriptor();
+        } else {
+            reqSalus(items);
+        }
+
+    });
+
+}
+
+
+
+getDescriptor();
