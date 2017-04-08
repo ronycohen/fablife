@@ -1,0 +1,25 @@
+
+		<form method="post">
+		    Enter your Gender: <input type="text" name="sex"><br/>
+		    Enter your Age: <input type="text" name="age"><br/>
+		   Enter your Weight:   <input type="text" name="currentWeight"><br/>
+		    <input type="submit">
+			</form>
+
+		<div id="errors"  style="color:#FF0000">
+			<%-errors%>
+		</div>
+
+	<% if (!!nutrinome) {%>
+		<div id="result">
+			Votre Nutrinome : <br/>
+		<table>
+			
+			<% for (var i in nutrinome) { %>
+			<tr>
+			 <td><%= JSON.stringify(nutrinome[i])%></td>
+			 </tr>
+			<% } %>
+		</table>
+		</div>
+	<% } %>

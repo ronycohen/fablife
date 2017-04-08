@@ -1,68 +1,42 @@
-var request = require('request');
-var prompt = require('prompt');
+var salus = require('./lib/salus');
+var express = require('express');
+var path = require('path');
+var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
 
-var bundle = "workshop-2";
-var items = [{name: 'sex'}, {name: 'weightCurrent'}, {name: 'age'}];
-var itemIdx = 0;
+var app = express();
+var router = express.Router()
 
-prompt.start();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(expressValidator()); // Add this after the bodyParser middlewares!
+app.use(express.static(path.join(__dirname, './view')));
+app.set('views', __dirname + '/view');
+app.set('view engine', 'jade');
 
-function reqSalus(items) {
+app.get('/', function(req, res) {
     'use strict';
-    var options = {
-        method: 'POST',
-        json: true,
-        headers: {
-            'content-type': 'application/json',
-            Authorization: 'admin34'
-        },
-        body: items
-    };
+    res.render(path.join(__dirname, './view/vue.ejs'), { nutrinome: "", errors: "" }); //render index.ejs with meta tags
+});
 
-
-    request('http://api.salus.fablife.com/bundle/' + bundle + '/salus', options, function(error, response, body) {
-        if (error) {
-            console.log('  err: ' + error);
-        }
-
-        if (!error && response.statusCode === 200) {
-            console.log(JSON.stringify(body, null, 2));
-        } else {
-            console.log("there is an error in the typed values.");
-        }
-
-    });
-}
-
-function getDescriptor() {
+app.post('/', function(req, res) {
     'use strict';
-    var descriptor = {
-        properties: {
-            descriptorValue: {
-                message: 'Please type a value for ' + items[itemIdx].name,
-                required: true
-            }
-        }
-    };
+    req.checkBody('sex', 'Invalid Gender').notEmpty().isAlpha().isLength({ min: 0, max: 1 });
+    req.checkBody('age', 'Invalid age').notEmpty().isInt();
+    req.checkBody('currentWeight', 'Invalid weight').notEmpty().isInt();
+    var errors = req.validationErrors();
+    if (errors) {
+        console.log("errors", JSON.stringify(errors));
+        res.render(path.join(__dirname, './view/vue.ejs'), { nutrinome: "", errors: JSON.stringify(errors) || "" });
+    } else {
+        salus.getNutrinomeWithDesc(req.body, function(result) {
+            res.render(path.join(__dirname, './view/vue.ejs'), { nutrinome: result.datas, errors: result.errors || "" });
+        });
+    }
+});
 
-    prompt.get(descriptor, function(err, result) {
-        if (err) {
-            console.log('  err: ' + err);
-        }
-
-        items[itemIdx].value = result.descriptorValue;
-        itemIdx++;
-
-        if (itemIdx < items.length) {
-            getDescriptor();
-        } else {
-            reqSalus(items);
-        }
-
-    });
-
-}
-
-
-
-getDescriptor();
+app.listen(3000, function() {
+    'use strict';
+    console.log('Rony test app listening on port 3000!');
+    //salus.promptDescriptor();
+});

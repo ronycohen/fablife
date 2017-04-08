@@ -5,3 +5,4 @@ npm install
 
 ## utilization
 > node fablife
+> launch your browser at http://localhost:3000
